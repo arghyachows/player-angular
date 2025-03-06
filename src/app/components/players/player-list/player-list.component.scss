@@ -1,0 +1,63 @@
+.player-list-container {
+  padding: 20px;
+  position: relative;
+  min-height: calc(100vh - 64px);
+
+  @media (max-width: 599px) {
+    padding: 16px;
+    min-height: calc(100vh - 56px);
+  }
+
+  h1 {
+    margin-bottom: 24px;
+    color: #333;
+  }
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding-bottom: 80px; // Space for FAB
+
+  @media (max-width: 599px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.player-card {
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  .player-info {
+    p {
+      margin: 8px 0;
+      color: rgba(0, 0, 0, 0.87);
+      
+      strong {
+        color: rgba(0, 0, 0, 0.6);
+        margin-right: 8px;
+      }
+    }
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px 16px;
+  }
+}
+
+.add-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+
+  @media (max-width: 599px) {
+    bottom: 16px;
+    right: 16px;
+  }
+}
