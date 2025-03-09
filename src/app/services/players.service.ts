@@ -11,7 +11,8 @@ export class PlayersService {
 
     constructor(private http: HttpClient) { }
 
-    getPlayers(): Observable<Player[]> {
-        return this.http.get<Player[]>(`${this.API_URL}/players`);
+    getPlayers(page: number = 1, pageSize: number = 100): Observable<Player[]> {
+        const skip = (page - 1) * pageSize;
+        return this.http.get<Player[]>(`${this.API_URL}/players?skip=${skip}&limit=${pageSize}`);
     }
 } 
