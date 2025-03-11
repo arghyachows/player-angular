@@ -7,7 +7,7 @@ import { Player } from '../interfaces/auth.interface';
     providedIn: 'root'
 })
 export class PlayersService {
-    private readonly API_URL = 'https://player-backend.vercel.app';
+    private readonly API_URL = 'api';
 
     constructor(private http: HttpClient) { }
 
