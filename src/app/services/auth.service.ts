@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
     providedIn: 'root'
 })
 export class AuthService {
-    private readonly API_URL = 'http://localhost:8000';
+    private readonly API_URL = 'https://player-backend.vercel.app/';
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
     isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 

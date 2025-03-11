@@ -1,5 +1,19 @@
 <div class="player-list-container">
   <h1>Players</h1>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Search Players</mat-label>
+      <input matInput (input)="onSearch($event)" placeholder="Enter player name">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+   <!-- Error Message -->
+   <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
   
   <div class="player-grid">
     <mat-card *ngFor="let player of players" class="player-card" style="background-color: #e3f2fd;">

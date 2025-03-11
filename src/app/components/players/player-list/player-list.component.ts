@@ -7,6 +7,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PlayersService } from '../../../services/players.service';
 import { Player } from '../../../interfaces/auth.interface';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { catchError, debounceTime, distinctUntilChanged, of, Subject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-player-list',
@@ -17,6 +20,9 @@ import { Player } from '../../../interfaces/auth.interface';
     MatButtonModule,
     MatIconModule,
     MatGridListModule,
+    MatFormField,
+    MatLabel,
+    MatInputModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './player-list.component.html',
@@ -28,17 +34,58 @@ export class PlayerListComponent implements OnInit {
   pageSize = 100;
   loading = false;
   hasMorePlayers = true;
+  searchQuery: string = '';
+  private searchTerms = new Subject<string>();
+  errorMessage: string = '';
 
   constructor(private playersService: PlayersService) { }
 
   ngOnInit() {
     this.loadPlayers();
+    this.searchTerms.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap((term: string) => this.playersService.searchPlayers(term).pipe(
+        catchError(error => {
+          this.errorMessage = error.error.detail || 'An error occurred';
+          return of([]);
+        })
+      ))
+    ).subscribe(players => {
+      this.players = players;
+      if (players.length === 0) {
+        this.errorMessage = 'No players found with the given name';
+      } else {
+        this.errorMessage = '';
+      }
+    });
+  }
+
+  onSearch(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery = input.value;
+    this.searchTerms.next(this.searchQuery);
+  }
+
+  searchPlayers(): void {
+    if (this.searchQuery.trim()) {
+      this.playersService.searchPlayers(this.searchQuery).subscribe(players => {
+        this.players = players;
+      });
+    } else {
+      this.players = this.players;
+    }
   }
 
   loadPlayers() {
     this.loading = true;
     console.log('Initial load - Page:', this.currentPage);
-    this.playersService.getPlayers(this.currentPage, this.pageSize).subscribe({
+
+    const playersObservable = this.searchQuery.trim()
+      ? this.playersService.searchPlayers(this.searchQuery)
+      : this.playersService.getPlayers(this.currentPage, this.pageSize);
+
+    playersObservable.subscribe({
       next: (players) => {
         console.log('Received initial players:', players.length);
         this.players = players;
@@ -59,7 +106,11 @@ export class PlayerListComponent implements OnInit {
     this.currentPage++;
     console.log('Loading more - Page:', this.currentPage);
 
-    this.playersService.getPlayers(this.currentPage, this.pageSize).subscribe({
+    const playersObservable = this.searchQuery.trim()
+      ? this.playersService.searchPlayers(this.searchQuery)
+      : this.playersService.getPlayers(this.currentPage, this.pageSize);
+
+    playersObservable.subscribe({
       next: (newPlayers) => {
         console.log('Received new players:', newPlayers.length);
         if (newPlayers.length < this.pageSize) {
